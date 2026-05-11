@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(uwb_charging)
+project(turtlebot_charging_project)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs

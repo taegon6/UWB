@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>uwb_charging</name>
+  <name>turtlebot_charging_project</name>
   <version>0.1.0</version>
   <description>UWB-guided TurtleBot charging with LiDAR local obstacle avoidance.</description>
 

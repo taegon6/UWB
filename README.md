@@ -1,6 +1,6 @@
-# UWB Charging TurtleBot
+# TurtleBot Charging Project
 
-This ROS1 package contains a LiDAR local planner for a TurtleBot wireless charging project.
+This ROS1 Noetic package contains a LiDAR local planner for a TurtleBot3 Waffle Pi wireless charging project.
 
 The planner does not build a SLAM map. UWB provides the robot pose and selected charger target, while LiDAR is used for real-time local obstacle avoidance.
 
@@ -37,7 +37,10 @@ When `/near_charger` becomes `true`, the local planner publishes zero velocity a
 cd ~/catkin_ws
 catkin_make
 source devel/setup.bash
-roslaunch uwb_charging lidar_local_planner.launch
+export ROS_MASTER_URI=http://172.20.10.8:11311
+export ROS_IP=172.20.10.8
+export TURTLEBOT3_MODEL=waffle_pi
+roslaunch turtlebot_charging_project lidar_local_planner.launch
 ```
 
 ## Manual UWB Test
@@ -59,3 +62,19 @@ Check state:
 ```bash
 rostopic echo /lidar_state
 ```
+
+## TurtleBot3 Waffle Pi Flow
+
+Keep these running first:
+
+- `roscore`
+- `roslaunch turtlebot3_bringup turtlebot3_robot.launch`
+- this package's `lidar_local_planner.launch`
+
+The LiDAR local planner runs from charger selection until the robot is within `goal_radius` of the target charger. At that point it stops `/cmd_vel`, publishes `/near_charger=true`, and the camera plus UWB docking process can take over.
+
+Recommended first test layout for a 5 m x 5 m space:
+
+- one obstacle near the start area
+- one obstacle near the charger area
+- avoid U-shaped or dead-end obstacle layouts for this local-only planner

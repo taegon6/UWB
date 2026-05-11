@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="uwb_charging" type="lidar_local_planner.py" name="lidar_local_planner" output="screen">
+  <node pkg="turtlebot_charging_project" type="lidar_local_planner.py" name="lidar_local_planner" output="screen">
     <param name="emergency_dist" value="0.30" />
     <param name="avoid_dist" value="0.55" />
     <param name="clear_dist" value="0.80" />
