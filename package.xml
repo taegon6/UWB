@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>uwb_charging</name>
+  <version>0.1.0</version>
+  <description>UWB-guided TurtleBot charging with LiDAR local obstacle avoidance.</description>
+
+  <maintainer email="student@example.com">Student</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <export>
+  </export>
+</package>
