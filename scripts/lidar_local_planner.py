@@ -23,10 +23,16 @@ class LidarLocalPlanner:
 
         self.goal_radius = rospy.get_param("~goal_radius", 0.80)
         self.control_period = rospy.get_param("~control_period", 0.05)
+        self.scan_timeout = rospy.Duration(rospy.get_param("~scan_timeout", 0.5))
+        self.uwb_timeout = rospy.Duration(rospy.get_param("~uwb_timeout", 1.5))
+        self.target_timeout = rospy.Duration(rospy.get_param("~target_timeout", 5.0))
 
         self.robot_pose = None
         self.target = None
         self.scan = None
+        self.last_pose_time = None
+        self.last_target_time = None
+        self.last_scan_time = None
 
         self.state = "WAIT"
 
@@ -42,16 +48,25 @@ class LidarLocalPlanner:
 
     def pose_callback(self, msg):
         self.robot_pose = msg
+        self.last_pose_time = rospy.Time.now()
 
     def target_callback(self, msg):
         self.target = msg
+        self.last_target_time = rospy.Time.now()
 
     def scan_callback(self, msg):
         self.scan = msg
+        self.last_scan_time = rospy.Time.now()
 
     def control_loop(self, _event):
         if self.robot_pose is None or self.target is None or self.scan is None:
             self.state = "WAIT"
+            self.publish_stop()
+            self.publish_state()
+            return
+        if self.input_timed_out():
+            self.state = "STALE_INPUT"
+            self.near_pub.publish(Bool(data=False))
             self.publish_stop()
             self.publish_state()
             return
@@ -98,6 +113,16 @@ class LidarLocalPlanner:
 
         self.cmd_pub.publish(twist)
         self.publish_state()
+
+    def input_timed_out(self):
+        now = rospy.Time.now()
+        checks = (
+            (self.last_scan_time, self.scan_timeout),
+            (self.last_pose_time, self.uwb_timeout),
+            (self.last_target_time, self.target_timeout),
+        )
+
+        return any(stamp is None or now - stamp > timeout for stamp, timeout in checks)
 
     def should_avoid(self, front_min):
         if self.state in ("AVOID_LEFT", "AVOID_RIGHT", "EMERGENCY_STOP"):

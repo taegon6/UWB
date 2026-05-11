@@ -3,6 +3,7 @@ project(turtlebot_charging_project)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  nav_msgs
   rospy
   sensor_msgs
   std_msgs
@@ -11,7 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package()
 
 catkin_install_python(PROGRAMS
+  scripts/charger_target_selector.py
   scripts/lidar_local_planner.py
+  scripts/uwb_pose_estimator.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

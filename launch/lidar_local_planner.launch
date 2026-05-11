@@ -8,5 +8,8 @@
     <param name="max_angular" value="0.70" />
     <param name="kp_heading" value="1.2" />
     <param name="goal_radius" value="0.80" />
+    <param name="scan_timeout" value="0.5" />
+    <param name="uwb_timeout" value="1.5" />
+    <param name="target_timeout" value="5.0" />
   </node>
 </launch>
