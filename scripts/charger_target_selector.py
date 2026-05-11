@@ -10,11 +10,14 @@ class ChargerTargetSelector:
         rospy.init_node("charger_target_selector")
 
         self.chargers = self.load_chargers()
+        self.default_charger_id = rospy.get_param("~default_charger_id", 0)
         self.target_pub = rospy.Publisher("/target_charger", Pose2D, queue_size=1, latch=True)
         self.status_pub = rospy.Publisher("/charger_target_status", String, queue_size=10)
 
         rospy.Subscriber("/selected_charger_id", Int32, self.selected_callback)
         rospy.loginfo("charger_target_selector ready. chargers=%s", sorted(self.chargers.keys()))
+        if self.default_charger_id:
+            rospy.Timer(rospy.Duration(0.5), self.default_timer_callback, oneshot=True)
 
     def load_chargers(self):
         raw_chargers = rospy.get_param(
@@ -38,6 +41,12 @@ class ChargerTargetSelector:
 
     def selected_callback(self, msg):
         charger_id = int(msg.data)
+        self.publish_target(charger_id)
+
+    def default_timer_callback(self, _event):
+        self.publish_target(int(self.default_charger_id))
+
+    def publish_target(self, charger_id):
         target = self.chargers.get(charger_id)
 
         if target is None:

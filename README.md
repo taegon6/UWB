@@ -48,6 +48,65 @@ export TURTLEBOT3_MODEL=waffle_pi
 roslaunch turtlebot_charging_project mapless_charging.launch
 ```
 
+## Gazebo Verification
+
+You can verify the mapless planner in Gazebo before running the real TurtleBot.
+
+Install TurtleBot3 Gazebo packages if they are missing:
+
+```bash
+sudo apt update
+sudo apt install -y ros-noetic-turtlebot3-gazebo
+```
+
+Then run:
+
+```bash
+source /opt/ros/noetic/setup.bash
+source ~/catkin_ws/devel/setup.bash
+export TURTLEBOT3_MODEL=waffle_pi
+roslaunch turtlebot_charging_project gazebo_mapless_test.launch
+```
+
+This launch starts:
+
+- TurtleBot3 Waffle Pi in Gazebo
+- a 5 m x 5 m style test world with two box obstacles and two charger markers
+- `sim_uwb_pose_from_odom.py`, which publishes fake `/uwb_pose` from Gazebo `/odom`
+- `charger_target_selector.py`, which automatically selects charger 1
+- `lidar_local_planner.py`, which publishes `/cmd_vel`
+
+Expected checks:
+
+```bash
+rostopic hz /scan
+rostopic echo /uwb_pose
+rostopic echo /target_charger
+rostopic echo /lidar_state
+rostopic echo /near_charger
+```
+
+Expected state flow:
+
+```text
+GO_TO_TARGET
+AVOID_LEFT or AVOID_RIGHT when a box is in front
+GO_TO_TARGET after the front sector clears
+NEAR_CHARGER when the robot enters the 0.8 m charger radius
+```
+
+To test charger 2 instead:
+
+```bash
+roslaunch turtlebot_charging_project gazebo_mapless_test.launch default_charger_id:=2
+```
+
+If Gazebo is too heavy over VNC, run without the GUI:
+
+```bash
+roslaunch turtlebot_charging_project gazebo_mapless_test.launch gui:=false
+```
+
 ## Mapless Charging Flow
 
 Use this package for the mapless UWB-LiDAR mode:
