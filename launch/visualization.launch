@@ -1,0 +1,13 @@
+<launch>
+  <node pkg="turtlebot_charging_project" type="uwb_rviz_visualizer.py" name="uwb_rviz_visualizer" output="screen">
+    <param name="frame_id" value="uwb_map" />
+    <param name="goal_radius" value="1.0" />
+    <rosparam param="anchors">
+      - [0.0, 0.0]
+      - [5.0, 0.0]
+      - [0.0, 5.0]
+      - [5.0, 5.0]
+    </rosparam>
+    <rosparam command="load" file="$(find turtlebot_charging_project)/config/charger_positions.yaml" />
+  </node>
+</launch>

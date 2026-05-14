@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  visualization_msgs
 )
 
 catkin_package()
@@ -18,6 +19,7 @@ catkin_install_python(PROGRAMS
   scripts/lidar_local_planner.py
   scripts/sim_uwb_pose_from_odom.py
   scripts/uwb_pose_estimator.py
+  scripts/uwb_rviz_visualizer.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -34,6 +36,10 @@ install(DIRECTORY docs
 )
 
 install(DIRECTORY matlab
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(DIRECTORY rviz
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

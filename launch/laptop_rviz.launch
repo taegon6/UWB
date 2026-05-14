@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find turtlebot_charging_project)/launch/visualization.launch" />
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find turtlebot_charging_project)/rviz/uwb_charging.rviz" output="screen" />
+</launch>

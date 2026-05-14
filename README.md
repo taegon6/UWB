@@ -83,6 +83,38 @@ roslaunch turtlebot_charging_project offline_research_test.launch obstacle_dista
 
 The fake UWB publisher moves the pose slowly toward the charger so you can verify that the planner recomputes target heading from repeated `/uwb_pose` updates and stops at `goal_radius`.
 
+## Laptop 2D RViz Map
+
+You can monitor the robot from a laptop as a live 2D UWB map. This does not require a SLAM map. It visualizes the 5 m x 5 m UWB coordinate frame, anchors, chargers, robot pose, path trail, target radius, and current LiDAR planner state.
+
+On the laptop, connect to the same ROS master:
+
+```bash
+source /opt/ros/noetic/setup.bash
+source ~/catkin_ws/devel/setup.bash
+export ROS_MASTER_URI=http://172.20.10.8:11311
+export ROS_IP=<LAPTOP_IP>
+roslaunch turtlebot_charging_project laptop_rviz.launch
+```
+
+RViz displays:
+
+- `/uwb_markers`: field boundary, anchors, chargers, robot arrow, 1 m stop radius, status text
+- `/uwb_path`: the robot path accumulated from `/uwb_pose`
+
+If you do not want to open RViz and only want marker topics:
+
+```bash
+roslaunch turtlebot_charging_project visualization.launch
+```
+
+For offline testing without the robot:
+
+```bash
+roslaunch turtlebot_charging_project offline_research_test.launch
+roslaunch turtlebot_charging_project laptop_rviz.launch
+```
+
 ## Gazebo Verification
 
 You can verify the mapless planner in Gazebo before running the real TurtleBot.

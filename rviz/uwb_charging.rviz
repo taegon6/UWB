@@ -1,0 +1,39 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Reference Frame: uwb_map
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /uwb_markers
+      Name: UWB Markers
+    - Class: rviz/Path
+      Enabled: true
+      Name: UWB Path
+      Topic: /uwb_path
+      Color: 25; 255; 255
+      Line Style: Lines
+      Line Width: 0.05
+  Enabled: true
+  Global Options:
+    Fixed Frame: uwb_map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Views:
+    Current:
+      Class: rviz/TopDownOrtho
+      Name: Top Down
+      Scale: 8
+Window Geometry:
+  Height: 900
+  Width: 1200
