@@ -1,0 +1,11 @@
+emergency_dist: 0.30
+avoid_dist: 0.55
+clear_dist: 0.80
+max_linear: 0.12
+slow_linear: 0.05
+max_angular: 0.70
+kp_heading: 1.2
+goal_radius: 1.00
+scan_timeout: 0.5
+uwb_timeout: 2.0
+target_timeout: 0.0

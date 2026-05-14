@@ -1,7 +1,9 @@
 <launch>
   <arg name="use_uwb_estimator" default="true" />
+  <arg name="selected_charger_id" default="0" />
 
   <node pkg="turtlebot_charging_project" type="charger_target_selector.py" name="charger_target_selector" output="screen">
+    <param name="default_charger_id" value="$(arg selected_charger_id)" />
     <rosparam command="load" file="$(find turtlebot_charging_project)/config/charger_positions.yaml" />
   </node>
 
@@ -13,9 +15,6 @@
       - [0.0, 5.0]
       - [5.0, 5.0]
     </rosparam>
-    <param name="min_valid_anchors" value="3" />
-    <param name="max_range" value="20.0" />
-    <param name="smoothing_alpha" value="0.35" />
   </node>
 
   <include file="$(find turtlebot_charging_project)/launch/lidar_local_planner.launch" />

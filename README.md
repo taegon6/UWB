@@ -48,6 +48,41 @@ export TURTLEBOT3_MODEL=waffle_pi
 roslaunch turtlebot_charging_project mapless_charging.launch
 ```
 
+## No-Robot Research Setup
+
+Use this when the TurtleBot is not connected yet. It runs fake UWB pose, fake LiDAR scan, charger selection, and the real local planner:
+
+```bash
+source /opt/ros/noetic/setup.bash
+source ~/catkin_ws/devel/setup.bash
+roslaunch turtlebot_charging_project offline_research_test.launch
+```
+
+Check the research loop:
+
+```bash
+rostopic echo /uwb_pose
+rostopic echo /target_charger
+rostopic echo /scan
+rostopic echo /lidar_state
+rostopic echo /cmd_vel
+rostopic echo /near_charger
+```
+
+Force obstacle avoidance:
+
+```bash
+roslaunch turtlebot_charging_project offline_research_test.launch obstacle_distance:=0.40
+```
+
+Test normal target driving:
+
+```bash
+roslaunch turtlebot_charging_project offline_research_test.launch obstacle_distance:=2.0
+```
+
+The fake UWB publisher moves the pose slowly toward the charger so you can verify that the planner recomputes target heading from repeated `/uwb_pose` updates and stops at `goal_radius`.
+
 ## Gazebo Verification
 
 You can verify the mapless planner in Gazebo before running the real TurtleBot.

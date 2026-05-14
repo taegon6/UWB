@@ -1,0 +1,27 @@
+<launch>
+  <arg name="selected_charger_id" default="1" />
+  <arg name="obstacle_distance" default="2.0" />
+  <arg name="fake_pose_rate" default="10.0" />
+  <arg name="fake_scan_rate" default="10.0" />
+
+  <node pkg="turtlebot_charging_project" type="charger_target_selector.py" name="charger_target_selector" output="screen">
+    <param name="default_charger_id" value="$(arg selected_charger_id)" />
+    <rosparam command="load" file="$(find turtlebot_charging_project)/config/charger_positions.yaml" />
+  </node>
+
+  <node pkg="turtlebot_charging_project" type="fake_uwb_pose_publisher.py" name="fake_uwb_pose_publisher" output="screen">
+    <param name="rate" value="$(arg fake_pose_rate)" />
+    <param name="start_x" value="0.5" />
+    <param name="start_y" value="0.5" />
+    <param name="theta" value="0.0" />
+    <param name="vx" value="0.03" />
+    <param name="vy" value="0.005" />
+  </node>
+
+  <node pkg="turtlebot_charging_project" type="fake_scan_publisher.py" name="fake_scan_publisher" output="screen">
+    <param name="rate" value="$(arg fake_scan_rate)" />
+    <param name="obstacle_distance" value="$(arg obstacle_distance)" />
+  </node>
+
+  <include file="$(find turtlebot_charging_project)/launch/lidar_local_planner.launch" />
+</launch>

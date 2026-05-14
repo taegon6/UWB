@@ -1,0 +1,11 @@
+<launch>
+  <arg name="bag" default="" />
+  <arg name="rate" default="1.0" />
+  <arg name="use_uwb_estimator" default="true" />
+
+  <include file="$(find turtlebot_charging_project)/launch/mapless_charging.launch">
+    <arg name="use_uwb_estimator" value="$(arg use_uwb_estimator)" />
+  </include>
+
+  <node if="$(eval bag != '')" pkg="rosbag" type="play" name="rosbag_play" args="--clock -r $(arg rate) $(arg bag)" output="screen" />
+</launch>

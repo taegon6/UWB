@@ -13,6 +13,8 @@ catkin_package()
 
 catkin_install_python(PROGRAMS
   scripts/charger_target_selector.py
+  scripts/fake_scan_publisher.py
+  scripts/fake_uwb_pose_publisher.py
   scripts/lidar_local_planner.py
   scripts/sim_uwb_pose_from_odom.py
   scripts/uwb_pose_estimator.py
@@ -24,6 +26,14 @@ install(DIRECTORY launch
 )
 
 install(DIRECTORY config
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(DIRECTORY docs
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(DIRECTORY matlab
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
