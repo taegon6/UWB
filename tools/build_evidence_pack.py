@@ -27,6 +27,7 @@ def main():
     git_commit = get_git_commit()
 
     write_project_summary(args.output_dir, git_commit)
+    write_project_context(args.output_dir)
     write_system_architecture(args.output_dir)
     write_algorithm_description(args.output_dir)
     write_experiment_table(args.output_dir, summaries)
@@ -98,14 +99,14 @@ def read_rows(path):
 def write_project_summary(output_dir, git_commit):
     content = """# Project Summary
 
-This project implements a mapless TurtleBot3 Waffle Pi wireless charging approach.
+This project implements the UWB-LiDAR approach phase of a TurtleBot3 Waffle Pi autonomous wireless charging system.
 
 System sequence:
 
-1. UWB estimates robot pose and provides charger target coordinates.
-2. LiDAR local planner drives toward the target while avoiding nearby obstacles.
+1. UWB estimates robot pose and selects one of two charging stations.
+2. LiDAR local planner drives toward the selected charger while avoiding nearby obstacles.
 3. The robot stops approximately 1 m before the charger target.
-4. Vision and UWB docking can take over for final alignment.
+4. Future QR vision alignment and mechanical guidance can take over for final 10 cm docking.
 
 Code version:
 
@@ -114,6 +115,16 @@ Code version:
 ```
 """.format(git_commit)
     write_text(os.path.join(output_dir, "project_summary.md"), content)
+
+
+def write_project_context(output_dir):
+    source_path = os.path.join("docs", "project_context.md")
+    target_path = os.path.join(output_dir, "project_context.md")
+    if os.path.exists(source_path):
+        shutil.copy2(source_path, target_path)
+        return
+
+    write_text(target_path, "# Project Context\n\nProject context source was not found.\n")
 
 
 def write_system_architecture(output_dir):
@@ -203,6 +214,8 @@ Rules:
 - Mention the code commit from `code_version.txt`.
 - Clearly separate completed work from future work.
 - Explain limitations: no global map, local obstacle avoidance only, U-shaped obstacles are not guaranteed.
+- Use `project_context.md` to explain the original TurtleBot wireless charging guide and how this repository narrows the scope to the UWB-LiDAR approach phase.
+- Do not claim final QR docking or wireless charging hardware completion unless supporting experiment evidence is present.
 """
     write_text(os.path.join(output_dir, "ai_writing_prompt.md"), content)
 

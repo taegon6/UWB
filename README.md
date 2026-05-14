@@ -301,6 +301,7 @@ python3 tools/build_evidence_pack.py \
 The output includes:
 
 - `project_summary.md`
+- `project_context.md`
 - `system_architecture.md`
 - `algorithm_description.md`
 - `experiment_table.csv`
@@ -311,6 +312,8 @@ The output includes:
 - copied config YAML files
 
 Use this evidence pack when asking AI to draft reports. Do not ask AI to invent missing numbers; add missing experiment notes to `failure_cases.md` or a lab note first.
+
+`docs/project_context.md` summarizes the original TurtleBot wireless charging student guide and clearly states this repository's current scope: UWB-based pose/charger target, LiDAR local approach and obstacle avoidance, 1 m pre-docking stop, and future handoff to QR docking.
 
 ## TurtleBot3 Waffle Pi Flow
 

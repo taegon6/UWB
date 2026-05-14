@@ -37,6 +37,7 @@ python3 tools/build_evidence_pack.py --raw-dir data/raw --output-dir docs/eviden
 
 The evidence pack is the preferred input for GPT/Codex writing:
 
+- It includes `project_context.md`, which explains the original TurtleBot wireless charging guide and the current repository scope.
 - It summarizes raw CSV logs.
 - It copies the active config files.
 - It records the code commit.
