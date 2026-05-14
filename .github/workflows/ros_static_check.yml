@@ -1,0 +1,38 @@
+name: ROS Static Check
+
+on:
+  push:
+    branches:
+      - main
+      - "codex/**"
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  static-check:
+    runs-on: ubuntu-latest
+    container: ros:noetic-ros-base-focal
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install basic tools
+        run: |
+          apt-get update
+          apt-get install -y libxml2-utils
+
+      - name: Python syntax check
+        run: |
+          python3 -m py_compile scripts/*.py
+          if [ -d tools ]; then python3 -m py_compile tools/*.py; fi
+
+      - name: Launch XML check
+        run: |
+          if [ -d launch ]; then xmllint --noout launch/*.launch; fi
+
+      - name: Package XML check
+        run: |
+          xmllint --noout package.xml

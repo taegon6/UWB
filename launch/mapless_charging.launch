@@ -9,6 +9,7 @@
   </node>
 
   <node if="$(arg use_uwb_estimator)" pkg="turtlebot_charging_project" type="uwb_pose_estimator.py" name="uwb_pose_estimator" output="screen">
+    <rosparam command="load" file="$(find turtlebot_charging_project)/config/uwb_calibration.yaml" />
     <rosparam param="anchors">
       - [0.0, 0.0]
       - [5.0, 0.0]

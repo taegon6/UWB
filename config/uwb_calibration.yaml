@@ -1,0 +1,9 @@
+# Bias convention: measured_range - expected_range.
+# The estimator corrects each range with corrected = raw - anchor_bias[index].
+anchor_bias: [0.0, 0.0, 0.0, 0.0]
+smoothing_alpha: 0.35
+max_range_jump: 0.50
+max_pose_jump: 0.70
+residual_threshold: 0.35
+max_range: 20.0
+min_valid_anchors: 3

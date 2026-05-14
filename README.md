@@ -190,6 +190,37 @@ rostopic pub /uwb/ranges std_msgs/Float32MultiArray "data: [0.71, 4.53, 4.53, 6.
 
 The example above is roughly a robot pose near `(0.5, 0.5)` when the anchors are at the four corners of a 5 m x 5 m area.
 
+## MATLAB Log Calibration Workflow
+
+The UWB estimator can be calibrated from measured logs:
+
+```bash
+python3 tools/analyze_uwb_log.py \
+  --input data/raw/uwb_log_2026_05_13_test01.csv \
+  --output config/uwb_calibration.yaml
+```
+
+The analyzer expects the preferred MATLAB CSV columns when available:
+
+```text
+time,true_x,true_y,odom_x,odom_y,odom_yaw,
+range_a0,range_a1,range_a2,range_a3,
+uwb_x,uwb_y,cmd_linear,cmd_angular,
+lidar_state,near_charger,selected_charger_id
+```
+
+It also tolerates the current experimental `cx_raw/cy_raw/cx_filtered/cy_filtered` logs, but those logs cannot calculate anchor range bias unless `true_x`, `true_y`, and `range_a*` columns are present.
+
+`config/uwb_calibration.yaml` is loaded by `mapless_charging.launch` and controls:
+
+- `anchor_bias`
+- `smoothing_alpha`
+- `max_range_jump`
+- `max_pose_jump`
+- `residual_threshold`
+- `max_range`
+- `min_valid_anchors`
+
 ## TurtleBot3 Waffle Pi Flow
 
 Keep these running first:
