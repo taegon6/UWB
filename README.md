@@ -288,6 +288,30 @@ It also tolerates the current experimental `cx_raw/cy_raw/cx_filtered/cy_filtere
 - `max_range`
 - `min_valid_anchors`
 
+## Evidence Pack for AI Writing
+
+After experiments, build a compact evidence pack for GPT/Codex/report writing:
+
+```bash
+python3 tools/build_evidence_pack.py \
+  --raw-dir data/raw \
+  --output-dir docs/evidence_pack
+```
+
+The output includes:
+
+- `project_summary.md`
+- `system_architecture.md`
+- `algorithm_description.md`
+- `experiment_table.csv`
+- `summary_metrics.csv`
+- `failure_cases.md`
+- `ai_writing_prompt.md`
+- `code_version.txt`
+- copied config YAML files
+
+Use this evidence pack when asking AI to draft reports. Do not ask AI to invent missing numbers; add missing experiment notes to `failure_cases.md` or a lab note first.
+
 ## TurtleBot3 Waffle Pi Flow
 
 Keep these running first:

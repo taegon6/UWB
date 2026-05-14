@@ -1,0 +1,37 @@
+experiment_id: exp_001_static_uwb
+date: 2026-05-14
+operator: your_name
+robot: TurtleBot3 Waffle Pi
+ros: Noetic
+git_commit: fill_with_git_rev_parse_head
+test_area: 5m x 5m
+
+objective: "Measure UWB position stability and calibrate anchor bias."
+
+anchor_positions:
+  - [0.0, 0.0]
+  - [5.0, 0.0]
+  - [0.0, 5.0]
+  - [5.0, 5.0]
+
+charger_positions:
+  - [1, 4.0, 1.2]
+  - [2, 4.0, 3.8]
+
+planner_params:
+  goal_radius: 1.0
+  max_linear: 0.06
+  max_angular: 0.40
+
+obstacles:
+  - name: start_box
+    position: [1.2, 0.5]
+    size: [0.4, 0.4]
+
+raw_files:
+  - data/raw/exp_001_static_uwb.csv
+
+bag_files:
+  - data/rosbag/exp_001_static_uwb.bag
+
+notes: "Fill in exact measurement points, failures, and environmental conditions."
