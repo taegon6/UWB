@@ -21,11 +21,12 @@ class LidarLocalPlanner:
         self.max_angular = rospy.get_param("~max_angular", 0.70)
         self.kp_heading = rospy.get_param("~kp_heading", 1.2)
 
-        self.goal_radius = rospy.get_param("~goal_radius", 0.80)
+        self.goal_radius = rospy.get_param("~goal_radius", 1.00)
         self.control_period = rospy.get_param("~control_period", 0.05)
         self.scan_timeout = rospy.Duration(rospy.get_param("~scan_timeout", 0.5))
-        self.uwb_timeout = rospy.Duration(rospy.get_param("~uwb_timeout", 1.5))
-        self.target_timeout = rospy.Duration(rospy.get_param("~target_timeout", 5.0))
+        self.uwb_timeout = rospy.Duration(rospy.get_param("~uwb_timeout", 2.0))
+        self.target_timeout_sec = rospy.get_param("~target_timeout", 0.0)
+        self.target_timeout = rospy.Duration(self.target_timeout_sec)
 
         self.robot_pose = None
         self.target = None
@@ -119,10 +120,15 @@ class LidarLocalPlanner:
         checks = (
             (self.last_scan_time, self.scan_timeout),
             (self.last_pose_time, self.uwb_timeout),
-            (self.last_target_time, self.target_timeout),
         )
 
-        return any(stamp is None or now - stamp > timeout for stamp, timeout in checks)
+        if any(stamp is None or now - stamp > timeout for stamp, timeout in checks):
+            return True
+
+        if self.target_timeout_sec > 0.0:
+            return self.last_target_time is None or now - self.last_target_time > self.target_timeout
+
+        return False
 
     def should_avoid(self, front_min):
         if self.state in ("AVOID_LEFT", "AVOID_RIGHT", "EMERGENCY_STOP"):

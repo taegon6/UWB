@@ -92,7 +92,7 @@ Expected state flow:
 GO_TO_TARGET
 AVOID_LEFT or AVOID_RIGHT when a box is in front
 GO_TO_TARGET after the front sector clears
-NEAR_CHARGER when the robot enters the 0.8 m charger radius
+NEAR_CHARGER when the robot enters the 1.0 m charger radius
 ```
 
 To test charger 2 instead:
@@ -115,7 +115,7 @@ Use this package for the mapless UWB-LiDAR mode:
 2. `charger_target_selector.py` converts the selected ID to `/target_charger`.
 3. `uwb_pose_estimator.py` converts `/uwb/ranges` plus `/odom` yaw to `/uwb_pose`.
 4. `lidar_local_planner.py` uses `/scan`, `/uwb_pose`, and `/target_charger` to publish `/cmd_vel`.
-5. When the robot is within `goal_radius`, it stops and publishes `/near_charger=true`.
+5. When the robot is within `goal_radius` (default 1.0 m), it stops and publishes `/near_charger=true`.
 6. Vision plus UWB docking takes over.
 
 The LiDAR driver should stay running. The planner stops using LiDAR for driving after `NEAR_CHARGER`, but the physical LiDAR sensor does not need to be power-cycled.
@@ -229,7 +229,9 @@ Keep these running first:
 - `roslaunch turtlebot3_bringup turtlebot3_robot.launch`
 - this package's `mapless_charging.launch`
 
-The LiDAR local planner runs from charger selection until the robot is within `goal_radius` of the target charger. At that point it stops `/cmd_vel`, publishes `/near_charger=true`, and the camera plus UWB docking process can take over.
+The LiDAR local planner runs from charger selection until the robot is within `goal_radius` of the target charger. The default is 1.0 m, so the robot stops about 1 m before the charger target. At that point it stops `/cmd_vel`, publishes `/near_charger=true`, and the camera plus UWB docking process can take over.
+
+During driving, `/uwb_pose` is read repeatedly. Each new UWB pose updates the robot's estimated `x`, `y`, and `theta`, and the planner recalculates the heading to `/target_charger`. Between UWB updates, the planner keeps using the latest valid pose. If UWB pose is not refreshed within `uwb_timeout` seconds, the planner stops with `STALE_INPUT`.
 
 Recommended first test layout for a 5 m x 5 m space:
 
