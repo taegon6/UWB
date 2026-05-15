@@ -320,8 +320,10 @@ Use this evidence pack when asking AI to draft reports. Do not ask AI to invent 
 Keep these running first:
 
 - `roscore`
-- `roslaunch turtlebot3_bringup turtlebot3_robot.launch`
+- `roslaunch turtlebot_charging_project robot_ld08_bringup.launch`
 - this package's `mapless_charging.launch`
+
+For this LD08-based TurtleBot, prefer `robot_ld08_bringup.launch`. It uses `turtlebot3_core.launch` plus `ld08_driver/ld08.launch`, which was verified to publish `/scan` around 9 Hz. The stock `turtlebot3_robot.launch` may require `LDS_MODEL=LDS-02` and can fail if the local LD08 launch wiring is inconsistent.
 
 The LiDAR local planner runs from charger selection until the robot is within `goal_radius` of the target charger. The default is 1.0 m, so the robot stops about 1 m before the charger target. At that point it stops `/cmd_vel`, publishes `/near_charger=true`, and the camera plus UWB docking process can take over.
 

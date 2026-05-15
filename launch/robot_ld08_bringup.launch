@@ -1,0 +1,12 @@
+<launch>
+  <arg name="camera" default="false" />
+
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_core.launch" />
+  <include file="$(find ld08_driver)/launch/ld08.launch" />
+
+  <node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen" />
+
+  <group if="$(arg camera)">
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_rpicamera.launch" />
+  </group>
+</launch>
