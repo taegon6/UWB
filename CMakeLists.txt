@@ -14,10 +14,16 @@ catkin_package()
 
 catkin_install_python(PROGRAMS
   scripts/charger_target_selector.py
+  scripts/charger_uwb_target_manager.py
+  scripts/dual_tag_uwb_pose_raw.py
   scripts/fake_scan_publisher.py
+  scripts/fake_uwb_imu_test.py
   scripts/fake_uwb_pose_publisher.py
   scripts/lidar_local_planner.py
+  scripts/odom_pose_from_start.py
   scripts/sim_uwb_pose_from_odom.py
+  scripts/uwb_imu_pose_fusion.py
+  scripts/uwb_imu_pose_publisher.py
   scripts/uwb_pose_estimator.py
   scripts/uwb_rviz_visualizer.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

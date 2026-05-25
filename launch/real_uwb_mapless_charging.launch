@@ -1,0 +1,47 @@
+<launch>
+  <!-- 실제 UWB dual-tag + IMU heading + LiDAR local planner 주행용. -->
+  <arg name="tag1_port" default="/dev/ttyUSB0" />
+  <arg name="tag2_port" default="/dev/ttyACM0" />
+  <arg name="auto_detect_uwb_ports" default="false" />
+  <arg name="tag2_is_front" default="true" />
+  <arg name="uwb_height_diff" default="0.72" />
+  <arg name="tag_distance" default="0.172" />
+  <arg name="tag1_offset" default="[0.072366, 0.085274, -0.219662]" />
+  <arg name="tag2_offset" default="[-0.260363, -0.241691, 0.066048]" />
+  <arg name="heading_source" default="initial_imu" />
+  <arg name="initial_heading_deg" default="-90.0" />
+  <arg name="imu_yaw_offset" default="0.0" />
+  <arg name="invert_imu_yaw" default="false" />
+  <arg name="auto_calibrate_yaw_offset" default="false" />
+  <arg name="uwb_timeout" default="10.0" />
+  <arg name="auto_publish_nearest_charger" default="true" />
+  <arg name="record_experiment" default="true" />
+  <arg name="record_label" default="real_uwb_mapless" />
+  <arg name="bag_dir" default="$(env HOME)/catkin_ws/src/turtlebot_charging_project/data/rosbag" />
+
+  <include file="$(find turtlebot_charging_project)/launch/mapless_charging.launch">
+    <arg name="use_uwb_estimator" value="false" />
+    <arg name="use_dual_tag_uwb_raw" value="true" />
+    <arg name="use_uwb_imu_fusion" value="true" />
+    <arg name="tag1_port" value="$(arg tag1_port)" />
+    <arg name="tag2_port" value="$(arg tag2_port)" />
+    <arg name="auto_detect_uwb_ports" value="$(arg auto_detect_uwb_ports)" />
+    <arg name="tag2_is_front" value="$(arg tag2_is_front)" />
+    <arg name="uwb_height_diff" value="$(arg uwb_height_diff)" />
+    <arg name="tag_distance" value="$(arg tag_distance)" />
+    <arg name="tag1_offset" value="$(arg tag1_offset)" />
+    <arg name="tag2_offset" value="$(arg tag2_offset)" />
+    <arg name="heading_source" value="$(arg heading_source)" />
+    <arg name="initial_heading_deg" value="$(arg initial_heading_deg)" />
+    <arg name="imu_yaw_offset" value="$(arg imu_yaw_offset)" />
+    <arg name="invert_imu_yaw" value="$(arg invert_imu_yaw)" />
+    <arg name="auto_calibrate_yaw_offset" value="$(arg auto_calibrate_yaw_offset)" />
+    <arg name="uwb_timeout" value="$(arg uwb_timeout)" />
+    <arg name="auto_publish_nearest_charger" value="$(arg auto_publish_nearest_charger)" />
+  </include>
+
+  <include if="$(arg record_experiment)" file="$(find turtlebot_charging_project)/launch/record_experiment.launch">
+    <arg name="bag_dir" value="$(arg bag_dir)" />
+    <arg name="bag_name" value="$(arg record_label)" />
+  </include>
+</launch>

@@ -1,8 +1,53 @@
 <launch>
   <arg name="use_uwb_estimator" default="true" />
+  <arg name="use_dual_tag_uwb_raw" default="false" />
+  <arg name="use_uwb_imu_fusion" default="false" />
+  <arg name="uwb_pose_raw_topic" default="/uwb/pose_raw" />
+  <arg name="imu_topic" default="/imu" />
+  <arg name="odom_topic" default="/odom" />
+  <arg name="heading_source" default="imu" />
+  <arg name="initial_heading_deg" default="-90.0" />
+  <arg name="imu_yaw_offset" default="0.0" />
+  <arg name="invert_imu_yaw" default="false" />
+  <arg name="auto_calibrate_yaw_offset" default="false" />
+  <arg name="imu_timeout" default="1.0" />
+  <!-- Temporary drive mode: keep the last UWB pose alive through short ranging gaps. -->
+  <arg name="uwb_timeout" default="10.0" />
+  <!-- Current robot wiring:
+       /dev/ttyUSB0 = UWB back tag 1
+       /dev/ttyACM0 = UWB front tag 2
+       /dev/ttyACM1 = OpenCR, /dev/ttyUSB1 = LD08 LiDAR. -->
+  <arg name="tag1_port" default="auto" />
+  <arg name="tag2_port" default="auto" />
+  <arg name="auto_detect_uwb_ports" default="true" />
+  <arg name="tag2_is_front" default="true" />
+  <arg name="uwb_height_diff" default="0.72" />
+  <arg name="tag_distance" default="0.172" />
+  <arg name="tag1_offset" default="[0.072366, 0.085274, -0.219662]" />
+  <arg name="tag2_offset" default="[-0.260363, -0.241691, 0.066048]" />
+  <arg name="use_static_charger_selector" default="true" />
+  <arg name="use_charger_uwb_target_manager" default="false" />
+  <arg name="charger_1_tag_id" default="3" />
+  <arg name="charger_2_tag_id" default="4" />
+  <arg name="charger_1_pose_topic" default="/charger_uwb/pose_1" />
+  <arg name="charger_2_pose_topic" default="/charger_uwb/pose_2" />
+  <arg name="charger_sample_duration" default="5.0" />
+  <arg name="charger_target_theta" default="0.0" />
+  <arg name="auto_publish_nearest_charger" default="false" />
 
-  <node pkg="turtlebot_charging_project" type="charger_target_selector.py" name="charger_target_selector" output="screen">
+  <node if="$(arg use_static_charger_selector)" pkg="turtlebot_charging_project" type="charger_target_selector.py" name="charger_target_selector" output="screen">
     <rosparam command="load" file="$(find turtlebot_charging_project)/config/charger_positions.yaml" />
+    <param name="target_theta" value="$(arg charger_target_theta)" />
+    <param name="auto_publish_nearest" value="$(arg auto_publish_nearest_charger)" />
+  </node>
+
+  <node if="$(arg use_charger_uwb_target_manager)" pkg="turtlebot_charging_project" type="charger_uwb_target_manager.py" name="charger_uwb_target_manager" output="screen">
+    <param name="charger_1_tag_id" value="$(arg charger_1_tag_id)" />
+    <param name="charger_2_tag_id" value="$(arg charger_2_tag_id)" />
+    <param name="charger_1_pose_topic" value="$(arg charger_1_pose_topic)" />
+    <param name="charger_2_pose_topic" value="$(arg charger_2_pose_topic)" />
+    <param name="sample_duration" value="$(arg charger_sample_duration)" />
+    <param name="target_theta" value="$(arg charger_target_theta)" />
   </node>
 
   <node if="$(arg use_uwb_estimator)" pkg="turtlebot_charging_project" type="uwb_pose_estimator.py" name="uwb_pose_estimator" output="screen">
@@ -10,12 +55,64 @@
     <rosparam param="anchors">
       - [0.0, 0.0]
       - [5.0, 0.0]
-      - [0.0, 5.0]
       - [5.0, 5.0]
     </rosparam>
     <param name="min_valid_anchors" value="3" />
     <param name="max_range" value="20.0" />
     <param name="smoothing_alpha" value="0.35" />
+    <param name="heading_source" value="$(arg heading_source)" />
+    <param name="imu_topic" value="$(arg imu_topic)" />
+    <param name="imu_timeout" value="$(arg imu_timeout)" />
+    <param name="height_diff" value="$(arg uwb_height_diff)" />
+  </node>
+
+  <node if="$(arg use_dual_tag_uwb_raw)" pkg="turtlebot_charging_project" type="dual_tag_uwb_pose_raw.py" name="dual_tag_uwb_pose_raw" output="screen">
+    <param name="port_tag1" value="$(arg tag1_port)" />
+    <param name="port_tag2" value="$(arg tag2_port)" />
+    <param name="auto_detect_ports" value="$(arg auto_detect_uwb_ports)" />
+    <param name="tag2_is_front" value="$(arg tag2_is_front)" />
+    <param name="height_diff" value="$(arg uwb_height_diff)" />
+    <param name="tag_distance" value="$(arg tag_distance)" />
+    <rosparam param="tag1_offset" subst_value="true">$(arg tag1_offset)</rosparam>
+    <rosparam param="tag2_offset" subst_value="true">$(arg tag2_offset)</rosparam>
+    <param name="max_cost" value="1.06" />
+    <rosparam param="anchors">
+      - [0.0, 0.0]
+      - [5.0, 0.0]
+      - [5.0, 5.0]
+    </rosparam>
+  </node>
+
+  <node if="$(arg use_uwb_imu_fusion)" pkg="turtlebot_charging_project" type="uwb_imu_pose_publisher.py" name="uwb_imu_pose_publisher" output="screen">
+    <param name="uwb_pose_raw_topic" value="$(arg uwb_pose_raw_topic)" />
+    <param name="imu_topic" value="$(arg imu_topic)" />
+    <param name="odom_topic" value="$(arg odom_topic)" />
+    <param name="heading_source" value="$(arg heading_source)" />
+    <param name="initial_heading_deg" value="$(arg initial_heading_deg)" />
+    <param name="imu_yaw_offset" value="$(arg imu_yaw_offset)" />
+    <param name="invert_imu_yaw" value="$(arg invert_imu_yaw)" />
+    <param name="auto_calibrate_yaw_offset" value="$(arg auto_calibrate_yaw_offset)" />
+    <param name="auto_calibrate_sample_count" value="20" />
+    <param name="auto_calibrate_min_resultant" value="0.70" />
+    <param name="auto_calibrate_max_position_std" value="0.35" />
+    <param name="imu_timeout" value="$(arg imu_timeout)" />
+    <param name="uwb_timeout" value="$(arg uwb_timeout)" />
+    <param name="allow_stale_uwb" value="true" />
+    <param name="max_stale_uwb_age" value="30.0" />
+    <param name="use_odom_prediction" value="true" />
+    <param name="odom_timeout" value="0.5" />
+    <param name="max_prediction_dt" value="0.20" />
+    <param name="uwb_correction_alpha" value="0.45" />
+    <param name="heading_correction_alpha" value="0.35" />
+    <param name="room_min_x" value="0.0" />
+    <param name="room_max_x" value="5.0" />
+    <param name="room_min_y" value="0.0" />
+    <param name="room_max_y" value="5.0" />
+    <param name="pose_bounds_margin" value="0.10" />
+    <param name="boundary_clamp_margin" value="0.0" />
+    <param name="invalid_origin_radius" value="0.12" />
+    <param name="max_pose_jump" value="0.80" />
+    <param name="require_pose_stability" value="true" />
   </node>
 
   <include file="$(find turtlebot_charging_project)/launch/lidar_local_planner.launch" />

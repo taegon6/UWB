@@ -15,13 +15,16 @@ class LidarLocalPlanner:
         self.emergency_dist = rospy.get_param("~emergency_dist", 0.30)
         self.avoid_dist = rospy.get_param("~avoid_dist", 0.55)
         self.clear_dist = rospy.get_param("~clear_dist", 0.80)
+        self.min_valid_scan_range = rospy.get_param("~min_valid_scan_range", 0.05)
 
         self.max_linear = rospy.get_param("~max_linear", 0.12)
         self.slow_linear = rospy.get_param("~slow_linear", 0.05)
         self.max_angular = rospy.get_param("~max_angular", 0.70)
         self.kp_heading = rospy.get_param("~kp_heading", 1.2)
 
-        self.goal_radius = rospy.get_param("~goal_radius", 1.00)
+        self.goal_radius = rospy.get_param("~goal_radius", 0.50)
+        self.latch_near_charger = rospy.get_param("~latch_near_charger", True)
+        self.goal_latch_reset_dist = rospy.get_param("~goal_latch_reset_dist", 0.20)
         self.control_period = rospy.get_param("~control_period", 0.05)
         self.scan_timeout = rospy.Duration(rospy.get_param("~scan_timeout", 0.5))
         self.uwb_timeout = rospy.Duration(rospy.get_param("~uwb_timeout", 2.0))
@@ -36,6 +39,7 @@ class LidarLocalPlanner:
         self.last_scan_time = None
 
         self.state = "WAIT"
+        self.goal_latched = False
 
         self.cmd_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.state_pub = rospy.Publisher("/lidar_state", String, queue_size=10)
@@ -52,6 +56,8 @@ class LidarLocalPlanner:
         self.last_pose_time = rospy.Time.now()
 
     def target_callback(self, msg):
+        if self.target_changed(msg):
+            self.goal_latched = False
         self.target = msg
         self.last_target_time = rospy.Time.now()
 
@@ -62,6 +68,12 @@ class LidarLocalPlanner:
     def control_loop(self, _event):
         if self.robot_pose is None or self.target is None or self.scan is None:
             self.state = "WAIT"
+            self.publish_stop()
+            self.publish_state()
+            return
+        if self.goal_latched:
+            self.state = "NEAR_CHARGER"
+            self.near_pub.publish(Bool(data=True))
             self.publish_stop()
             self.publish_state()
             return
@@ -77,6 +89,8 @@ class LidarLocalPlanner:
         dist_to_goal = math.hypot(dx, dy)
 
         if dist_to_goal < self.goal_radius:
+            if self.latch_near_charger:
+                self.goal_latched = True
             self.state = "NEAR_CHARGER"
             self.near_pub.publish(Bool(data=True))
             self.publish_stop()
@@ -130,6 +144,12 @@ class LidarLocalPlanner:
 
         return False
 
+    def target_changed(self, msg):
+        if self.target is None:
+            return False
+        target_delta = math.hypot(msg.x - self.target.x, msg.y - self.target.y)
+        return target_delta > self.goal_latch_reset_dist
+
     def should_avoid(self, front_min):
         if self.state in ("AVOID_LEFT", "AVOID_RIGHT", "EMERGENCY_STOP"):
             return front_min < self.clear_dist
@@ -159,7 +179,8 @@ class LidarLocalPlanner:
         for index, distance in enumerate(self.scan.ranges):
             if math.isinf(distance) or math.isnan(distance):
                 continue
-            if distance < self.scan.range_min or distance > self.scan.range_max:
+            min_range = max(self.scan.range_min, self.min_valid_scan_range)
+            if distance <= min_range or distance > self.scan.range_max:
                 continue
 
             angle_rad = self.scan.angle_min + index * self.scan.angle_increment

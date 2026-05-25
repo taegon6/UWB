@@ -1,0 +1,26 @@
+<launch>
+  <arg name="bag_dir" default="$(env HOME)/catkin_ws/src/turtlebot_charging_project/data/rosbag" />
+  <arg name="bag_name" default="uwb_lidar_charging_test" />
+  <arg name="prefix_time" default="true" />
+  <arg name="record_scan" default="true" />
+  <arg name="record_camera" default="false" />
+
+  <node pkg="rosbag" type="record" name="experiment_rosbag_record" output="screen"
+        args="--buffsize=512 --split --duration=10m -O $(arg bag_dir)/$(arg bag_name)
+              /uwb/pose_raw
+              /uwb/pose
+              /uwb_pose
+              /uwb_pose_status
+              /target_charger
+              /charger_target_status
+              /scan
+              /odom
+              /imu
+              /cmd_vel
+              /lidar_state
+              /near_charger
+              /battery_state
+              /joint_states
+              /tf
+              /tf_static" />
+</launch>

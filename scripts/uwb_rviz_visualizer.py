@@ -16,7 +16,7 @@ class UwbRvizVisualizer:
         self.frame_id = rospy.get_param("~frame_id", "uwb_map")
         self.path_max_points = rospy.get_param("~path_max_points", 1000)
         self.goal_radius = rospy.get_param("~goal_radius", 1.0)
-        self.anchors = self.load_points("~anchors", [[0.0, 0.0], [5.0, 0.0], [0.0, 5.0], [5.0, 5.0]])
+        self.anchors = self.load_points("~anchors", [[0.0, 0.0], [5.0, 0.0], [5.0, 5.0]])
         self.chargers = self.load_chargers()
 
         self.robot_pose = None
@@ -44,8 +44,23 @@ class UwbRvizVisualizer:
         raw_chargers = rospy.get_param("~chargers", [[1, 4.0, 1.2], [2, 4.0, 3.8]])
         chargers = []
         for item in raw_chargers:
-            if len(item) >= 3:
-                chargers.append((int(item[0]), float(item[1]), float(item[2])))
+            try:
+                if isinstance(item, dict):
+                    charger_id = int(item.get("charger_id", item.get("id")))
+                    x = float(item["x"])
+                    y = float(item["y"])
+                else:
+                    if len(item) < 3:
+                        rospy.logwarn("Ignoring invalid charger entry: %s", item)
+                        continue
+                    charger_id = int(item[0])
+                    x = float(item[1])
+                    y = float(item[2])
+            except (TypeError, ValueError, KeyError) as exc:
+                rospy.logwarn("Ignoring invalid charger entry %s: %s", item, exc)
+                continue
+
+            chargers.append((charger_id, x, y))
         return chargers
 
     def pose_callback(self, msg):
@@ -106,6 +121,10 @@ class UwbRvizVisualizer:
             markers.markers.append(self.make_text(stamp, marker_id, self.robot_pose.x, self.robot_pose.y + 0.35, status, 0.16))
             marker_id += 1
 
+            if self.target is not None:
+                markers.markers.append(self.make_target_line_marker(stamp, marker_id, self.robot_pose, self.target))
+                marker_id += 1
+
         self.marker_pub.publish(markers)
         self.path_pub.publish(self.path)
 
@@ -148,6 +167,17 @@ class UwbRvizVisualizer:
         marker.color.g = 0.8
         marker.color.b = 0.0
         marker.color.a = 0.22
+        return marker
+
+    def make_target_line_marker(self, stamp, marker_id, pose, target):
+        marker = self.base_marker(stamp, marker_id, Marker.LINE_STRIP)
+        marker.scale.x = 0.04
+        marker.color.r = 1.0
+        marker.color.g = 0.45
+        marker.color.b = 0.0
+        marker.color.a = 0.9
+        marker.points.append(Point(x=pose.x, y=pose.y, z=0.06))
+        marker.points.append(Point(x=target.x, y=target.y, z=0.06))
         return marker
 
     def make_cylinder(self, stamp, marker_id, x, y, diameter, height, color):
