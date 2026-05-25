@@ -2,13 +2,13 @@ emergency_dist: 0.30
 avoid_dist: 0.55
 clear_dist: 0.80
 min_valid_scan_range: 0.05
-max_linear: 0.12
-slow_linear: 0.05
-max_angular: 0.70
+max_linear: 0.08
+slow_linear: 0.04
+max_angular: 0.60
 kp_heading: 1.2
 goal_radius: 1.00
 latch_near_charger: true
 goal_latch_reset_dist: 0.20
 scan_timeout: 0.5
-uwb_timeout: 10.0
+uwb_timeout: 2.0
 target_timeout: 0.0
