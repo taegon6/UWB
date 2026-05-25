@@ -48,6 +48,50 @@ export TURTLEBOT3_MODEL=waffle_pi
 roslaunch turtlebot_charging_project mapless_charging.launch
 ```
 
+## Real Demo Launch
+
+The real demo launch runs only the UWB-to-LiDAR local approach pipeline:
+
+```text
+/uwb/pose_raw -> /uwb_pose -> /target_charger -> /cmd_vel
+```
+
+The local planner stops at `goal_radius=1.0 m` from the selected charger and then hands off to the QR/camera alignment stage.
+
+Start the TurtleBot bringup first so `/scan`, `/imu`, and `/odom` are available:
+
+```bash
+roslaunch turtlebot_charging_project robot_ld08_bringup.launch
+```
+
+Then run the demo pipeline:
+
+```bash
+roslaunch turtlebot_charging_project demo_uwb_lidar_charging.launch initial_heading_deg:=-90.0
+```
+
+Do not run `uwb_pose_estimator.py` and `uwb_imu_pose_publisher.py` at the same time because both can publish `/uwb_pose`.
+
+Check the demo topics:
+
+```bash
+rostopic echo /uwb/pose_raw
+rostopic echo /uwb_pose
+rostopic echo /uwb_pose_status
+rostopic echo /target_charger
+rostopic echo /lidar_state
+rostopic echo /near_charger
+rostopic echo /cmd_vel
+```
+
+Confirm that `/uwb_pose` has only one publisher:
+
+```bash
+rostopic info /uwb_pose
+```
+
+For this demo, stale UWB reuse is disabled by default in `demo_uwb_lidar_charging.launch` with `allow_stale_uwb=false`, so the robot should not keep driving for a long time after UWB pose updates stop.
+
 ## No-Robot Research Setup
 
 Use this when the TurtleBot is not connected yet. It runs fake UWB pose, fake LiDAR scan, charger selection, and the real local planner:
