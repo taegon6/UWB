@@ -22,7 +22,7 @@ class LidarLocalPlanner:
         self.max_angular = rospy.get_param("~max_angular", 0.70)
         self.kp_heading = rospy.get_param("~kp_heading", 1.2)
 
-        self.goal_radius = rospy.get_param("~goal_radius", 0.50)
+        self.goal_radius = rospy.get_param("~goal_radius", 1.00)
         self.latch_near_charger = rospy.get_param("~latch_near_charger", True)
         self.goal_latch_reset_dist = rospy.get_param("~goal_latch_reset_dist", 0.20)
         self.control_period = rospy.get_param("~control_period", 0.05)
@@ -35,7 +35,6 @@ class LidarLocalPlanner:
             "UWB_ODOM_POSE_OK",
             "UWB_IMU_POSE_OK",
             "UWB_POSE_RECOVERED",
-            "UWB_RAW_POSE_OK",
             "ODOM_POSE_OK",
         }
 

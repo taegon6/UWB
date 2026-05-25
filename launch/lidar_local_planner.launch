@@ -1,5 +1,8 @@
 <launch>
+  <arg name="require_good_uwb_status" default="false" />
+
   <node pkg="turtlebot_charging_project" type="lidar_local_planner.py" name="lidar_local_planner" output="screen">
     <rosparam command="load" file="$(find turtlebot_charging_project)/config/planner_params.yaml" />
+    <param name="require_good_uwb_status" value="$(arg require_good_uwb_status)" type="bool" />
   </node>
 </launch>

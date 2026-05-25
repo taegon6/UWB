@@ -11,18 +11,23 @@
   <arg name="tag2_is_front" default="true" />
   <arg name="uwb_height_diff" default="0.72" />
   <arg name="tag_distance" default="0.172" />
+  <arg name="tag1_offset" default="[0.072366, 0.085274, -0.219662]" />
+  <arg name="tag2_offset" default="[-0.260363, -0.241691, 0.066048]" />
   <arg name="auto_publish_nearest_charger" default="true" />
   <arg name="uwb_timeout" default="2.0" />
   <arg name="allow_stale_uwb" default="false" />
   <arg name="max_stale_uwb_age" default="3.0" />
 
   <node pkg="turtlebot_charging_project" type="dual_tag_uwb_pose_raw.py" name="dual_tag_uwb_pose_raw" output="screen">
+    <remap from="/uwb_pose_status" to="/uwb/raw_status" />
     <param name="port_tag1" value="$(arg tag1_port)" />
     <param name="port_tag2" value="$(arg tag2_port)" />
     <param name="auto_detect_ports" value="$(arg auto_detect_uwb_ports)" type="bool" />
     <param name="tag2_is_front" value="$(arg tag2_is_front)" type="bool" />
     <param name="height_diff" value="$(arg uwb_height_diff)" type="double" />
     <param name="tag_distance" value="$(arg tag_distance)" type="double" />
+    <rosparam param="tag1_offset" subst_value="true">$(arg tag1_offset)</rosparam>
+    <rosparam param="tag2_offset" subst_value="true">$(arg tag2_offset)</rosparam>
     <param name="max_tag_dt" value="0.20" type="double" />
     <param name="max_cost" value="0.15" type="double" />
     <param name="position_alpha" value="0.30" type="double" />
@@ -57,5 +62,7 @@
     <param name="latch_auto_target" value="true" type="bool" />
   </node>
 
-  <include file="$(find turtlebot_charging_project)/launch/lidar_local_planner.launch" />
+  <include file="$(find turtlebot_charging_project)/launch/lidar_local_planner.launch">
+    <arg name="require_good_uwb_status" value="true" />
+  </include>
 </launch>
