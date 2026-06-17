@@ -1,0 +1,11 @@
+﻿file,title,paper_use,note
+fig01_system_architecture.png,전체 시스템 구성도,논문 방법론: 시스템 구성,기존 패키지 그림/실제 로그 그래프
+fig02_operation_flow.png,자율 충전 동작 흐름도,논문 방법론: 알고리즘 흐름,기존 패키지 그림/실제 로그 그래프
+fig03_experiment_layout.png,UWB/충전소 실험 배치도,논문 실험환경,기존 패키지 그림/실제 로그 그래프
+fig04_reference_to_system_map.png,참고자료-시스템 설계 연결도,논문 서론/방법론,새로 생성한 논문용 개념도
+fig05_uwb_anchor_geometry.png,UWB anchor geometry 및 위치추정 개념도,논문 UWB 위치추정 설명,새로 생성한 논문용 개념도
+fig06_ros_topic_pipeline.png,ROS topic 기반 UWB-LiDAR 접근 pipeline,논문 구현 구조,새로 생성한 논문용 개념도
+fig07_uwb_static_scatter.png,실제 UWB 정적 좌표 산점도,논문 예비 결과,기존 패키지 그림/실제 로그 그래프
+fig08_uwb_static_error.png,실제 UWB 기준점 오차 그래프,논문 예비 결과,기존 패키지 그림/실제 로그 그래프
+fig09_all_uwb_log_trace.png,저장된 UWB 로그 궤적,논문 예비 결과/부록,기존 패키지 그림/실제 로그 그래프
+fig10_paper_figure_index.png,논문 삽입 그림/사진 후보 목록,교수님 논문 구성 협의,새로 생성한 논문용 개념도

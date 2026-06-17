@@ -1,1 +1,11 @@
-file,rows,uwb_x_std,uwb_y_std,uwb_error_mean,near_charger_count,lidar_states
+file,rows,metric,value,unit,source,note
+data/raw/uwb_static_position_test_20260513.csv,10,sample_count,10,samples,"uwb_logs_combined.csv; stable sessions uwb_log_20260513_201035.csv and uwb_log_20260513_201302.csv","Static UWB samples around the assumed lab center reference point."
+data/raw/uwb_static_position_test_20260513.csv,10,mean_error,1.57,cm,"against reference point (2.50 m, 2.50 m)","Actual stored UWB log analysis; reference is the lab center assumption used in the delivery package."
+data/raw/uwb_static_position_test_20260513.csv,10,rmse,1.71,cm,"against reference point (2.50 m, 2.50 m)","Computed from the ten stable static samples."
+data/raw/uwb_static_position_test_20260513.csv,10,p95_error,2.52,cm,"against reference point (2.50 m, 2.50 m)","95th percentile of static position error."
+data/raw/uwb_static_position_test_20260513.csv,10,x_std,1.09,cm,"filtered UWB x repeatability","Static repeatability metric."
+data/raw/uwb_static_position_test_20260513.csv,10,y_std,1.15,cm,"filtered UWB y repeatability","Static repeatability metric."
+data/raw/uwb_logs_combined.csv,129,all_log_rows,129,rows,"all stored UWB coordinate logs","Traceability count for the combined coordinate log."
+data/raw/uwb_logs_combined.csv,129,all_log_mean_x,2.558,m,"all stored UWB coordinate logs","Traceability only; not a performance metric."
+data/raw/uwb_logs_combined.csv,129,all_log_mean_y,2.482,m,"all stored UWB coordinate logs","Traceability only; not a performance metric."
+data/raw/approach_handoff_preliminary_log.csv,6,planner_stop_radius,1.00,m,"configured LiDAR planner goal_radius","Preliminary logic check; QR/final charging success was not measured."

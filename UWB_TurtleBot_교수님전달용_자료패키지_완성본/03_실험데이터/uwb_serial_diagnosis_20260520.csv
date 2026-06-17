@@ -1,0 +1,6 @@
+﻿metric,count,note
+range_confirm_sent,4571,successful ranging confirmations observed in COM5 live log
+poll_receive_fail,59607,poll receive failures observed; firmware/serial state should be checked before real driving
+final_receive_fail,4011,final receive failures observed; likely ranging stability issue during monitor run
+failure_to_confirm_ratio,13.92,"diagnostic ratio, not a final performance metric"
+log_lines,136438,serial_logs/com5_live.log

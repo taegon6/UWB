@@ -1,0 +1,6 @@
+﻿id,title,url,use
+[1],ROBOTIS TurtleBot3 e-Manual: Features / Waffle Pi,https://emanual.robotis.com/docs/en/platform/turtlebot3/features/,"TurtleBot3 Waffle Pi 플랫폼, LiDAR/카메라/ROS 기반 구성 근거"
+[2],ROBOTIS TurtleBot3 e-Manual: Navigation,https://emanual.robotis.com/docs/en/platform/turtlebot3/navigation/,일반 SLAM/map 기반 navigation과 본 연구의 mapless UWB-LiDAR 접근 방식 비교
+[3],Qorvo DW1000 UWB Transceiver,https://www.qorvo.com/products/p/DW1000,"UWB ranging, TWR/TDoA RTLS, 약 10 cm급 위치 응용 가능성 근거"
+[4],Ultrawideband-based precise short-range localization for wireless power transfer to electric vehicles in parking environments,https://pmc.ncbi.nlm.nih.gov/articles/PMC8176549/,무선전력전송에서 단거리 위치추정과 정렬 오차가 중요하다는 연구 배경
+[5],OpenCV QRCodeDetector Class Reference,https://docs.opencv.org/3.4/de/dc3/classcv_1_1QRCodeDetector.html,QR marker 검출과 최종 시각 정렬 단계 설계 근거

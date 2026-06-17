@@ -1,0 +1,21 @@
+﻿type,id,title,content,note_or_url
+equation,(1),좌표 변환,p_c^base = T_base^map p_c^map,"충전소 목표점이 map/odom 기준으로 주어질 경우, LiDAR 기반 제어는 base frame에서 목표 방향을 계산한다."
+equation,(2),LaserScan 각도,theta_i = angle_min + i * angle_increment,ranges[i]가 로봇 전방 기준 어느 방향의 거리값인지 계산한다.
+equation,(3),유효 거리 집합,"R = {r_i | finite(r_i), max(range_min, r_min) < r_i <= range_max}","NaN, Inf, 센서 하한 이하 및 상한 초과 값을 제어 계산에서 제외한다."
+equation,(4),전방 섹터,S_F = {r_i in R | -20 deg <= theta_i <= 20 deg},정면 충돌 위험을 판단하는 각도 범위이다.
+equation,(5),전방 대표거리,"d_F = (1/K) sum_{k=1}^{K} r_(k),  K=max(1, floor(0.1N))",전방 거리값을 오름차순 정렬한 뒤 하위 10% 평균을 사용한다.
+equation,(6),좌우 절사평균,d_side = mean({r_(k) | 0.2N <= k <= 0.8N}),측면 여유 공간은 20-80% 절사평균으로 계산한다.
+equation,(7),회피 점수,"J_L = 0.7d_FL + 0.3d_L,  J_R = 0.7d_FR + 0.3d_R",전방 좌우 공간을 더 크게 반영하여 회피 방향을 선택한다.
+equation,(8),목표 거리,d_goal = sqrt((x_c-x_r)^2 + (y_c-y_r)^2),UWB pose와 선택된 충전소 목표점 사이의 평면 거리이다.
+equation,(9),목표 방향 오차,"e_theta = wrap(atan2(y_c-y_r, x_c-x_r) - theta_r)",로봇 heading과 목표점 방향 사이의 각도 오차이다.
+equation,(10),목표 추종 각속도,"omega_goal = clamp(k_p e_theta, -omega_max, omega_max)",장애물이 없을 때 목표 방향으로 회전하기 위한 비례 제어식이다.
+equation,(11),목표 추종 선속도,v = 0 if |e_theta|>20 deg; v_slow if 10 deg<|e_theta|<=20 deg; v_max otherwise,목표 방향과 크게 틀어진 상태에서 전진하지 않도록 한다.
+equation,(12),회피 진입,EMERGENCY if d_F<0.30; AVOID if d_F<0.55; CLEAR if d_F>=0.80,코드의 세 거리 임계값을 상태 전이 조건으로 정리한 식이다.
+equation,(13),회피 명령,"v_cmd=v_slow, omega_cmd=+0.7omega_max if J_L>J_R else -0.7omega_max",좌우 여유 공간 점수에 따라 회피 회전 방향을 선택한다.
+equation,(14),비상 정지 회전,"v_cmd=0, omega_cmd=+omega_max if J_L>J_R else -omega_max",전방 거리가 emergency_dist보다 작으면 전진을 멈춘 뒤 큰 여유 공간 쪽으로 회전한다.
+equation,(15),근접 handoff,near_charger = true if d_goal < 1.00 m,LiDAR 근거리 접근이 끝나면 QR 기반 최종 정렬 단계로 넘긴다.
+equation,(16),권장 보완식,"v_safe <= sqrt(2 a_brake max(d_F-d_safe,0))",현재 구현을 논문화할 때 추가할 수 있는 제동거리 기반 안전속도 상한이다. 실제 코드에는 아직 별도 파라미터로 구현되어 있지 않다.
+reference,[1],ROS sensor_msgs/LaserScan message documentation,,https://docs.ros.org/en/kinetic/api/sensor_msgs/html/msg/LaserScan.html
+reference,[2],ROS tf package documentation,,https://docs.ros.org/en/kinetic/api/tf/html/c++/
+reference,[3],"J. Borenstein and Y. Koren, The Vector Field Histogram - Fast Obstacle Avoidance for Mobile Robots, IEEE Transactions on Robotics and Automation, 1991.",,https://public.websites.umich.edu/~ykoren/uploads/The_Vector_Field_HistogramuFast_Obstacle_Avoidance.pdf
+reference,[4],"D. Fox, W. Burgard, and S. Thrun, The Dynamic Window Approach to Collision Avoidance, IEEE Robotics & Automation Magazine, 1997.",,https://cir.nii.ac.jp/crid/1363388843526965632
