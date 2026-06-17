@@ -10,7 +10,6 @@ import statistics
 DEFAULT_ANCHORS = [
     (0.0, 0.0),
     (5.0, 0.0),
-    (0.0, 5.0),
     (5.0, 5.0),
 ]
 
@@ -21,8 +20,8 @@ def main():
     parser.add_argument("--output", default="config/uwb_calibration.yaml", help="Output YAML path")
     parser.add_argument(
         "--anchors",
-        default="0,0;5,0;0,5;5,5",
-        help="Anchor coordinates as 'x,y;x,y;x,y;x,y'",
+        default="0,0;5,0;5,5",
+        help="Anchor coordinates as 'x,y;x,y;x,y'",
     )
     args = parser.parse_args()
 

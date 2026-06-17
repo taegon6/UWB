@@ -1,0 +1,10 @@
+﻿metric,value,unit,source
+sample_count,10,samples,"uwb_logs_combined.csv, stable static sessions"
+mean_error,1.57,cm,"against (2.50, 2.50 m) reference"
+rmse,1.71,cm,"against (2.50, 2.50 m) reference"
+p95_error,2.52,cm,"against (2.50, 2.50 m) reference"
+x_std,1.09,cm,filtered UWB x repeatability
+y_std,1.15,cm,filtered UWB y repeatability
+all_log_rows,129,rows,all stored UWB coordinate logs
+all_log_mean_x,2.558,m,for traceability only
+all_log_mean_y,2.482,m,for traceability only

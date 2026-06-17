@@ -1,1 +1,7 @@
-file,rows,start_time,end_time,columns
+file,rows,start_time,end_time,columns,evidence_type,note
+data/raw/uwb_static_position_test_20260513.csv,10,2026-05-13T20:10:42.288132,2026-05-13T20:13:29.254268,"trial;source_file;time;true_x_m;true_y_m;estimated_x_m;estimated_y_m;error_m;error_cm;note",static_position_analysis,"Actual stored UWB log samples analyzed against the assumed center reference."
+data/raw/uwb_static_summary_20260513.csv,9,,,"metric;value;unit;source",metric_summary,"Summary metrics derived from the stable static UWB samples."
+data/raw/uwb_logs_combined.csv,129,,,"source_file;time;cx_raw;cy_raw;cx_filtered;cy_filtered;heading_raw;heading_filtered;cost;tag1_raw_a;tag1_raw_b;tag1_raw_c;tag2_raw_a;tag2_raw_b;tag2_raw_c;tag1_filtered_a;tag1_filtered_b;tag1_filtered_c;tag2_filtered_a;tag2_filtered_b;tag2_filtered_c;tag1_corrected_a;tag1_corrected_b;tag1_corrected_c;tag2_corrected_a;tag2_corrected_b;tag2_corrected_c",combined_uwb_log,"Combined stored UWB coordinate logs for traceability."
+data/raw/uwb_serial_diagnosis_20260520.csv,5,,,"event;count;meaning",serial_diagnosis,"COM5 serial diagnosis counts from the UWB ranging run."
+data/raw/approach_handoff_preliminary_log.csv,6,,,"trial;start_position;start_x_m;start_y_m;selected_station;selection_success;planner_stop_radius_m;handoff_distance_cm;charging_started;note",handoff_logic_check,"Configured charger selection and LiDAR-to-QR handoff logic check; final charging was not measured."
+data/raw/anchor_charger_coordinates.csv,6,,,"name;type;x_m;y_m;note",geometry_reference,"Anchor and charger coordinates used in the delivery package."

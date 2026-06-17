@@ -3,7 +3,15 @@ venv/
 __pycache__/
 *.pyc
 *.bag
+*.bag.active
 *.zip
+*.ipynb
 data/raw/*.csv
 data/processed/*.yaml
 uwb_log_*.csv
+uwb_logs_combined.csv
+output/
+tmp/
+serial_logs/
+tag1
+tag2

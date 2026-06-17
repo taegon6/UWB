@@ -1,0 +1,21 @@
+<launch>
+  <!-- Demo fallback: use manually entered start pose + wheel odometry as /uwb_pose. -->
+  <arg name="start_x" default="0.3" />
+  <arg name="start_y" default="2.0" />
+  <arg name="start_theta" default="0.0" />
+  <arg name="auto_publish_nearest_charger" default="true" />
+
+  <node pkg="turtlebot_charging_project" type="odom_pose_from_start.py" name="odom_pose_from_start" output="screen">
+    <param name="start_x" value="$(arg start_x)" />
+    <param name="start_y" value="$(arg start_y)" />
+    <param name="start_theta" value="$(arg start_theta)" />
+  </node>
+
+  <include file="$(find turtlebot_charging_project)/launch/mapless_charging.launch">
+    <arg name="use_uwb_estimator" value="false" />
+    <arg name="use_dual_tag_uwb_raw" value="false" />
+    <arg name="use_uwb_imu_fusion" value="false" />
+    <arg name="use_static_charger_selector" value="true" />
+    <arg name="auto_publish_nearest_charger" value="$(arg auto_publish_nearest_charger)" />
+  </include>
+</launch>

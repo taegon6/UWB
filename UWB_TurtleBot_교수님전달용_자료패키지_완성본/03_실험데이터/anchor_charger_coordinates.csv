@@ -1,0 +1,9 @@
+﻿device,x_m,y_m,height_m,note
+A1,0.00,0.00,1.00,5 m x 5 m test frame corner; configured anchor_0
+A2,5.00,0.00,1.00,5 m x 5 m test frame corner; configured anchor_1
+A3,0.00,5.00,1.00,5 m x 5 m test frame corner; configured anchor_2
+A4,5.00,5.00,1.00,5 m x 5 m test frame corner; configured anchor_3
+C1,1.20,1.20,0.00,charger_id 1 from config/charger_positions.yaml
+C2,3.80,3.80,0.00,charger_id 2 from config/charger_positions.yaml
+QR1,1.20,1.20,0.00,planned marker center for final visual alignment
+QR2,3.80,3.80,0.00,planned marker center for final visual alignment

@@ -1,0 +1,11 @@
+﻿no,name,equation,description
+(1),UWB 거리 측정 모델,z_i(k) = ||p(k) - a_i||_2 + b_i + eps_i(k),"i번째 anchor a_i와 tag 위치 p 사이의 실제 거리, anchor bias b_i, 측정 잡음 eps_i를 포함한 ranging 모델."
+(2),ToF 기반 거리 환산,r_i = c * tau_i,전파 전파시간 tau_i에 광속 c를 곱해 거리로 환산한다. 실제 DW1000 TWR에서는 clock offset/antenna delay 보정이 필요하다.
+(3),비선형 최소제곱 위치추정,p_hat = argmin_p sum_i w_i (||p - a_i||_2 - (z_i - b_i))^2,4개 UWB anchor 거리값을 가장 잘 만족하는 2D 위치 p를 추정한다.
+(4),선형화된 trilateration 식,"2(a_i-a_1)^T p = r_1^2 - r_i^2 + ||a_i||^2 - ||a_1||^2,  i=2,...,N","첫 anchor 방정식을 빼서 x,y에 대한 선형 방정식 Ap=b를 구성한다."
+(5),위치 smoothing,p_f(k) = alpha p_hat(k) + (1-alpha) p_f(k-1),본 프로젝트 config의 smoothing_alpha=0.35를 적용할 수 있는 1차 저역통과 필터.
+(6),충전소 선택,"j* = argmin_j ||p_f - c_j||_2,  j in {1,2}",현재 UWB 위치에서 가장 가까운 충전 스테이션을 target charger로 선택한다.
+(7),목표 heading 오차,"e_theta = wrap(atan2(c_y - y, c_x - x) - theta)",로봇 heading과 목표 충전소 방향 사이의 각도 오차.
+(8),LiDAR local planner 속도 명령,"v = v_max I(d_goal > R_goal),   omega = sat(k_theta e_theta, -omega_max, omega_max)",goal_radius 밖에서는 저속 전진하고 heading 오차에 비례해 회전한다.
+(9),LiDAR sector 안전거리,d_S = min_{phi in S} r(phi),front/front-left/front-right 등 sector별 최소 LaserScan 거리로 장애물 회피 상태를 결정한다.
+(10),QR marker 중심 오차,"e_q = [u_q - u_0, v_q - v_0]^T,   q_c = (1/4) sum_m q_m",QR 네 꼭짓점 평균으로 marker 중심을 구하고 영상 중심과의 픽셀 오차를 최종 정렬에 사용한다.

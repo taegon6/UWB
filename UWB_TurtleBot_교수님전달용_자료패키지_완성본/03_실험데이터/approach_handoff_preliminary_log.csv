@@ -1,0 +1,7 @@
+﻿trial,start_position,start_x_m,start_y_m,selected_station,selection_success,planner_stop_radius_m,handoff_distance_cm,charging_started,note
+1,S1,0.50,0.50,C1,Y,1.00,100,N/A,preliminary logic check from configured charger coordinates; QR/final charging test not yet measured
+2,S2,2.50,0.70,C1,Y,1.00,100,N/A,preliminary logic check from configured charger coordinates; QR/final charging test not yet measured
+3,S3,4.50,0.60,C2,Y,1.00,100,N/A,preliminary logic check from configured charger coordinates; QR/final charging test not yet measured
+4,S4,0.80,4.20,C1,Y,1.00,100,N/A,preliminary logic check from configured charger coordinates; QR/final charging test not yet measured
+5,S5,2.50,2.50,C2,Y,1.00,100,N/A,preliminary logic check from configured charger coordinates; QR/final charging test not yet measured
+6,S6,4.40,4.30,C2,Y,1.00,100,N/A,preliminary logic check from configured charger coordinates; QR/final charging test not yet measured

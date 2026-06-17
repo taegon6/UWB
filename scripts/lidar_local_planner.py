@@ -15,6 +15,7 @@ class LidarLocalPlanner:
         self.emergency_dist = rospy.get_param("~emergency_dist", 0.30)
         self.avoid_dist = rospy.get_param("~avoid_dist", 0.55)
         self.clear_dist = rospy.get_param("~clear_dist", 0.80)
+        self.min_valid_scan_range = rospy.get_param("~min_valid_scan_range", 0.05)
 
         self.max_linear = rospy.get_param("~max_linear", 0.12)
         self.slow_linear = rospy.get_param("~slow_linear", 0.05)
@@ -22,20 +23,31 @@ class LidarLocalPlanner:
         self.kp_heading = rospy.get_param("~kp_heading", 1.2)
 
         self.goal_radius = rospy.get_param("~goal_radius", 1.00)
+        self.latch_near_charger = rospy.get_param("~latch_near_charger", True)
+        self.goal_latch_reset_dist = rospy.get_param("~goal_latch_reset_dist", 0.20)
         self.control_period = rospy.get_param("~control_period", 0.05)
         self.scan_timeout = rospy.Duration(rospy.get_param("~scan_timeout", 0.5))
         self.uwb_timeout = rospy.Duration(rospy.get_param("~uwb_timeout", 2.0))
         self.target_timeout_sec = rospy.get_param("~target_timeout", 0.0)
         self.target_timeout = rospy.Duration(self.target_timeout_sec)
+        self.require_good_uwb_status = rospy.get_param("~require_good_uwb_status", True)
+        self.allowed_uwb_statuses = {
+            "UWB_ODOM_POSE_OK",
+            "UWB_IMU_POSE_OK",
+            "UWB_POSE_RECOVERED",
+            "ODOM_POSE_OK",
+        }
 
         self.robot_pose = None
         self.target = None
         self.scan = None
+        self.uwb_pose_status = None
         self.last_pose_time = None
         self.last_target_time = None
         self.last_scan_time = None
 
         self.state = "WAIT"
+        self.goal_latched = False
 
         self.cmd_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.state_pub = rospy.Publisher("/lidar_state", String, queue_size=10)
@@ -43,6 +55,7 @@ class LidarLocalPlanner:
 
         rospy.Subscriber("/scan", LaserScan, self.scan_callback)
         rospy.Subscriber("/uwb_pose", Pose2D, self.pose_callback)
+        rospy.Subscriber("/uwb_pose_status", String, self.uwb_pose_status_callback)
         rospy.Subscriber("/target_charger", Pose2D, self.target_callback)
 
         rospy.Timer(rospy.Duration(self.control_period), self.control_loop)
@@ -52,6 +65,8 @@ class LidarLocalPlanner:
         self.last_pose_time = rospy.Time.now()
 
     def target_callback(self, msg):
+        if self.target_changed(msg):
+            self.goal_latched = False
         self.target = msg
         self.last_target_time = rospy.Time.now()
 
@@ -59,9 +74,25 @@ class LidarLocalPlanner:
         self.scan = msg
         self.last_scan_time = rospy.Time.now()
 
+    def uwb_pose_status_callback(self, msg):
+        self.uwb_pose_status = msg.data
+
     def control_loop(self, _event):
+        if self.goal_latched:
+            self.state = "NEAR_CHARGER"
+            self.near_pub.publish(Bool(data=True))
+            self.publish_stop()
+            self.publish_state()
+            return
         if self.robot_pose is None or self.target is None or self.scan is None:
             self.state = "WAIT"
+            self.publish_stop()
+            self.publish_state()
+            return
+        # Gate motion on fused UWB pose health so bad localization cannot keep driving.
+        if self.require_good_uwb_status and not self.uwb_status_is_good():
+            self.state = "STALE_INPUT"
+            self.near_pub.publish(Bool(data=False))
             self.publish_stop()
             self.publish_state()
             return
@@ -77,6 +108,8 @@ class LidarLocalPlanner:
         dist_to_goal = math.hypot(dx, dy)
 
         if dist_to_goal < self.goal_radius:
+            if self.latch_near_charger:
+                self.goal_latched = True
             self.state = "NEAR_CHARGER"
             self.near_pub.publish(Bool(data=True))
             self.publish_stop()
@@ -130,6 +163,15 @@ class LidarLocalPlanner:
 
         return False
 
+    def target_changed(self, msg):
+        if self.target is None:
+            return False
+        target_delta = math.hypot(msg.x - self.target.x, msg.y - self.target.y)
+        return target_delta > self.goal_latch_reset_dist
+
+    def uwb_status_is_good(self):
+        return self.uwb_pose_status in self.allowed_uwb_statuses
+
     def should_avoid(self, front_min):
         if self.state in ("AVOID_LEFT", "AVOID_RIGHT", "EMERGENCY_STOP"):
             return front_min < self.clear_dist
@@ -141,15 +183,20 @@ class LidarLocalPlanner:
         yaw_error = self.normalize_angle(target_yaw - self.robot_pose.theta)
 
         twist = Twist()
-        twist.linear.x = self.max_linear
         twist.angular.z = self.clamp(
             self.kp_heading * yaw_error,
             -self.max_angular,
             self.max_angular,
         )
 
-        if abs(yaw_error) > math.radians(45.0):
-            twist.linear.x = min(twist.linear.x, 0.03)
+        # Rotate first so the robot does not surge forward while facing away from the target.
+        abs_yaw_error = abs(yaw_error)
+        if abs_yaw_error > math.radians(20.0):
+            twist.linear.x = 0.0
+        elif abs_yaw_error > math.radians(10.0):
+            twist.linear.x = self.slow_linear
+        else:
+            twist.linear.x = self.max_linear
 
         return twist
 
@@ -159,7 +206,8 @@ class LidarLocalPlanner:
         for index, distance in enumerate(self.scan.ranges):
             if math.isinf(distance) or math.isnan(distance):
                 continue
-            if distance < self.scan.range_min or distance > self.scan.range_max:
+            min_range = max(self.scan.range_min, self.min_valid_scan_range)
+            if distance <= min_range or distance > self.scan.range_max:
                 continue
 
             angle_rad = self.scan.angle_min + index * self.scan.angle_increment
