@@ -5,66 +5,68 @@
 This repository currently contains a TurtleBot/UWB-LiDAR charging project.
 Do not remove or rewrite the existing ROS project unless explicitly asked.
 
-A new follow-up research workspace is added under:
+The UWB example setup workspace is under:
 
 - `research/uwb_followup/`
 
-## UWB follow-up research goal
+## Current goal
 
-The follow-up study focuses on UWB RTLS methods from the reference projects:
-
-- `FastTurtle7892/UWB-Ranging-Optimization`
-- `FastTurtle7892/UWB_AoA_Project`
-- `FastTurtle7892/UWB-Autonomous-Robot` only as background/reference
-
-The first goal is not hardware flashing. The first goal is to reproduce the method in simulation and identify weaknesses.
+The immediate goal is environment setup only.
 
 Focus on:
 
-1. DS-TWR ranging and timing parameters
-2. Treply / packet time / measurement-rate tradeoff
-3. AoA angle estimation from phase difference
-4. 2D position estimation from range R and angle theta
-5. Error analysis and filtering
+1. Cloning the reference UWB repositories.
+2. Checking available examples.
+3. Identifying active `example_selection.h` definitions.
+4. Preparing notes for local hardware execution later.
+
+Do not start algorithm analysis, filtering research, or simulation expansion unless explicitly requested.
+
+## Reference repositories
+
+Use these as external/local reference repositories:
+
+- `FastTurtle7892/UWB-Ranging-Optimization`
+- `FastTurtle7892/UWB_AoA_Project`
+- `FastTurtle7892/UWB-Autonomous-Robot`
+
+They should be cloned under:
+
+- `research/uwb_followup/original_repos/`
+
+Do not commit cloned reference repositories into this repository.
 
 ## Constraints
 
 - Codex cloud cannot access local UWB hardware, USB, UART, nRF boards, Raspberry Pi SPI, or Segger Embedded Studio.
 - Do not attempt to flash hardware from the cloud environment.
-- Hardware-specific code should be analyzed and documented, not executed in Codex cloud.
+- Hardware-specific code should be inspected and documented, not executed in Codex cloud.
 - Keep reference/original repositories unchanged unless explicitly asked.
-- New research code should go under `research/uwb_followup/`.
+- New setup scripts or notes should go under `research/uwb_followup/`.
 
-## Setup
+## Setup commands
 
-Install Python dependencies with:
+From the repository root:
 
 ```bash
 pip install -r requirements.txt
+bash research/uwb_followup/scripts/check_local_environment.sh
+bash research/uwb_followup/scripts/bootstrap_reference_repos.sh
+python research/uwb_followup/scripts/list_uwb_examples.py
 ```
 
-Run the baseline UWB AoA simulation with:
+## Suggested first Codex task
 
-```bash
-python research/uwb_followup/simulation/run_all.py
-```
+1. Read `research/uwb_followup/README.md`.
+2. Run the setup commands above.
+3. Create `research/uwb_followup/notes/example_inventory.md`.
+4. Summarize:
+   - cloned repositories
+   - README files
+   - `example_selection.h` files
+   - active examples
+   - examples related to SS-TWR, DS-TWR, PDOA, AoA
 
-## Validation
-
-Run:
-
-```bash
-python research/uwb_followup/simulation/run_all.py
-python -m pytest research/uwb_followup/tests
-```
-
-If tests are missing, create basic tests for numerical functions before changing algorithms.
-
-## Suggested first Codex tasks
-
-1. Inspect `research/uwb_followup/README.md`.
-2. Summarize the FastTurtle7892 UWB reference repositories in `research/uwb_followup/notes/repo_map.md`.
-3. Extend the baseline simulation to compare vertical, horizontal, and diagonal movement.
-4. Add RMSE, mean error, max error, x-axis error, and y-axis error metrics.
-5. Compare raw estimates, moving average, median filter, and Kalman filter.
-6. Save plots under `research/uwb_followup/results/`.
+Do not modify firmware code yet.
+Do not create new simulations yet.
+Do not attempt hardware flashing.
