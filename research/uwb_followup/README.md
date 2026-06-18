@@ -1,77 +1,143 @@
-# UWB Follow-up Research Workspace
+# UWB Example Setup Workspace
 
-This workspace is for follow-up research on UWB RTLS methods.
+This workspace is for preparing and inspecting UWB reference examples before doing follow-up research.
 
-The first goal is to reproduce the original method in simulation before trying hardware flashing or UART-based measurement.
+The immediate goal is:
 
-## Reference projects
+1. Clone the reference UWB repositories.
+2. Check what examples exist.
+3. Identify which example is currently selected.
+4. Prepare a local/Codex workflow for reading and running what can be run without hardware.
+
+This is not yet the analysis stage.
+
+## Reference repositories
+
+The setup script downloads these repositories under `research/uwb_followup/original_repos/`:
 
 - `FastTurtle7892/UWB-Ranging-Optimization`
 - `FastTurtle7892/UWB_AoA_Project`
-- `FastTurtle7892/UWB-Autonomous-Robot` as background/reference
+- `FastTurtle7892/UWB-Autonomous-Robot`
 
-## Research focus
-
-1. DS-TWR ranging and timing parameters
-2. `Treply`, packet time, and measurement-rate tradeoff
-3. AoA angle estimation from phase difference
-4. 2D position estimation from range `R` and angle `theta`
-5. Error analysis and filtering
-
-## Why simulation first?
-
-The reference UWB projects depend on embedded hardware such as DW3000/DW3110, nRF52840-DK, Raspberry Pi SPI, UART logging, and vendor SDK build tools. Codex cloud cannot access those devices directly.
-
-Therefore, this workspace starts with Python simulation:
-
-```text
-range R + angle theta
-        -> x = R cos(theta)
-        -> y = R sin(theta)
-        -> noise injection
-        -> filtering
-        -> error metrics
-```
-
-## Setup
+## Codex / local setup
 
 From the repository root:
 
 ```bash
 pip install -r requirements.txt
+bash research/uwb_followup/scripts/check_local_environment.sh
+bash research/uwb_followup/scripts/bootstrap_reference_repos.sh
+python research/uwb_followup/scripts/list_uwb_examples.py
 ```
 
-## Run baseline simulation
+## What each script does
 
-```bash
-python research/uwb_followup/simulation/run_all.py
-```
+### `check_local_environment.sh`
 
-The script prints RMSE and mean position error for raw and filtered estimates. It also saves a plot to:
+Checks whether basic tools are installed:
+
+- `git`
+- `python` / `python3`
+- `pip`
+- `make`
+- `gcc` / `g++`
+
+It also checks optional embedded tools:
+
+- `arm-none-eabi-gcc`
+- `JLinkExe`
+- `nrfjprog`
+- `minicom`
+- `picocom`
+
+These optional tools are mainly for local hardware work, not Codex cloud.
+
+### `bootstrap_reference_repos.sh`
+
+Clones or updates the reference UWB repositories into:
 
 ```text
-research/uwb_followup/results/aoa_filter_comparison.png
+research/uwb_followup/original_repos/
 ```
 
-## Current baseline model
+The cloned repositories are not committed into this repo. They are local working copies for inspection.
 
-The simplified AoA relation is:
+### `list_uwb_examples.py`
+
+Scans the cloned repositories and prints:
+
+- README files
+- `example_selection.h` files
+- active `#define` example selections
+- commented example options
+- example directories under `API/Src/examples/`
+
+This is the first useful command to run in Codex after cloning the references.
+
+## Important limitation
+
+Codex cloud can inspect files, run Python scripts, and sometimes compile simple host-side code.
+
+Codex cloud cannot directly access:
+
+- nRF52840 boards
+- DW3000/DW3110 hardware
+- Raspberry Pi SPI
+- USB UART
+- Segger Embedded Studio GUI
+- J-Link hardware
+
+So the current workflow is:
 
 ```text
-theta = arcsin(delta_phi / pi)
+Codex:
+  clone repos
+  inspect examples
+  check selected examples
+  prepare build/run notes
+
+Local PC / lab machine:
+  install embedded tools
+  connect UWB boards
+  flash firmware
+  read UART logs
 ```
 
-Position is estimated by:
+## First Codex prompt
+
+Use this prompt in Codex:
 
 ```text
-x = R cos(theta)
-y = R sin(theta)
+Read AGENTS.md and research/uwb_followup/README.md.
+Do not do analysis yet.
+Set up the UWB example workspace only.
+
+Run:
+1. pip install -r requirements.txt
+2. bash research/uwb_followup/scripts/check_local_environment.sh
+3. bash research/uwb_followup/scripts/bootstrap_reference_repos.sh
+4. python research/uwb_followup/scripts/list_uwb_examples.py
+
+Then create research/uwb_followup/notes/example_inventory.md summarizing:
+- which repositories were cloned
+- which README files exist
+- which example_selection.h files exist
+- which examples are currently active
+- which examples look relevant for DS-TWR, SS-TWR, AoA, and PDOA
+
+Do not modify firmware code yet.
+Do not create simulations yet.
+Do not attempt hardware flashing.
 ```
 
-## Next research tasks
+## Later steps
 
-1. Add horizontal and diagonal motion scenarios.
-2. Separate range noise and angle noise experiments.
-3. Compare x-axis error and y-axis error.
-4. Add packet-time / Treply simulation for DS-TWR.
-5. Document weaknesses in `notes/weakness_analysis.md`.
+After the example inventory is clear, the next step is to choose one minimal example to prepare for local hardware execution.
+
+Likely candidates:
+
+- device ID read test
+- simple TX/RX
+- SS-TWR initiator/responder
+- DS-TWR initiator/responder
+- PDOA/AoA-related examples
